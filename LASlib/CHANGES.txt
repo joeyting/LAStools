@@ -1,3 +1,10 @@
+22 March 2017 -- LASlib: new filter '-thin_points_with_time 0.000001' vs '-thin_pulses_with_time 0.001'
+12 March 2017 -- LASlib: new filters '-drop_every_nth' '-drop_number_of_returns' '-keep_number_of_returns'
+8 March 2017 -- LASlib: new transform '-copy_user_data_into_scanner_channel' fixes bad LAS 1.4 files
+6 March 2017 -- LASlib: new transform '-copy_NIR_into_intensity' for point types 8 and 10
+1 February 2017 -- LASlib: better support for OGC WKT strings in VLRs or EVLRs when reading
+1 February 2017 -- LASlib: new transform '-copy_intensity_into_z' for use in lasgrid or lascanopy
+16 January 2017 -- LASlib: support for NAVD88 Geoids when generating OGC WKT string via '-vertical_navd88_geoid12b'
 6 January 2017 -- all LAStools: rudimentary support for Lambert Conic Conformal (1SP) by ignoring scale factor
 6 January 2017 -- all LAStools: more EPSG codes due to updates 'pcs.csv' and 'gcs.csv' files 
 4 January 2017 -- all LAStools: added DHHN92 "Deutsches Haupthoehennetz 1992" for OpenNRW LiDAR (-vertical_dhhn92)

@@ -255,7 +255,7 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
     fprintf(stderr,"WARNING: header->version_major is %d. writing 1 instead.\n", header->version_major);
     version_major = 1;
   }
-  if (!stream->putByte(header->version_major))
+  if (!stream->putByte(version_major))
   {
     fprintf(stderr,"ERROR: writing header->version_major\n");
     return FALSE;
@@ -1198,11 +1198,14 @@ I64 LASwriterLAS::close(BOOL update_header)
 
   if (p_count != npoints)
   {
+    if (npoints || !update_header)
+    {
 #ifdef _WIN32
-    fprintf(stderr,"WARNING: written %I64d points but expected %I64d points\n", p_count, npoints);
+      fprintf(stderr,"WARNING: written %I64d points but expected %I64d points\n", p_count, npoints);
 #else
-    fprintf(stderr,"WARNING: written %lld points but expected %lld points\n", p_count, npoints);
+      fprintf(stderr,"WARNING: written %lld points but expected %lld points\n", p_count, npoints);
 #endif
+    }
   }
 
   if (writer) 
