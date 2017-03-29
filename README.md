@@ -11,11 +11,11 @@ project](https://github.com/LAStools/LAStools)._
 
 # LASlib/LASzip
 
-LASlib (with LASzip) is a C++ programming API for reading / writing LIDAR
-data stored in standard LAS or in compressed LAZ format (1.0 - 1.3). Both
-libraries - LASlib with LASzip - are released together under the terms of
-the GNU Lesser General Public Licence also known as LGPL. See LICENSE.txt
-for details.
+LASlib (with LASzip) is a C++ programming API for reading / writing
+LIDAR data stored in standard LAS or in compressed LAZ format (1.0 -
+1.3). Both libraries - LASlib with LASzip - are released together
+under the terms of the GNU Lesser General Public Licence also known as
+LGPL. See [LICENSE.txt](LICENSE.txt) for details.
 
 Internally LASlib includes the stand-alone LASzip compression library that
 provides lossless compression for LAS data. This allows you to read or
