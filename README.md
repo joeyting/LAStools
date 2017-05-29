@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
 
 This fork was updated from [the original
 repository](https://github.com/LAStools/LAStools) for the last
-time on the 29th March 2017.
+time on the 29th May 2017.
 
 
 --------------------
