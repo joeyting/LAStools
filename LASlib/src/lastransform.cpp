@@ -737,6 +737,31 @@ private:
   U8 class_to;
 };
 
+class LASoperationClassifyIntensityBetweenAs : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "classify_intensity_between_as"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d %d %d ", name(), (I32)intensity_below, (I32)intensity_above, (I32)class_to); };
+  inline void transform(LASpoint* point) {
+    if ((intensity_above <= point->intensity) && (point->intensity <= intensity_above))
+    {
+      if (class_to >= 32)
+      {
+        point->classification = class_to;
+      }
+      else
+      {
+        point->classification = (point->classification & 224) | class_to;
+      }
+    }
+  };
+  LASoperationClassifyIntensityBetweenAs(U16 intensity_below, U16 intensity_above, U8 class_to) { this->intensity_below = intensity_below; this->intensity_above = intensity_above; this->class_to = class_to; };
+private:
+  U16 intensity_below;
+  U16 intensity_above;
+  U8 class_to;
+};
+
 class LASoperationSetWithheldFlag : public LASoperation
 {
 public:
@@ -813,6 +838,28 @@ public:
 private:
   U8 user_data_from;
   U8 user_data_to;
+};
+
+class LASoperationCopyClassificationIntoUserData : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "copy_classification_into_user_data"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline void transform(LASpoint* point) { point->set_user_data(point->get_classification() ? point->get_classification() : point->get_extended_classification()); };
+};
+
+class LASoperationCopyAttributeIntoUserData : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "copy_attribute_into_user_data"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), index); };
+  inline void transform(LASpoint* point) {
+    F64 user_data = point->get_attribute_as_float(index);
+    point->set_user_data(U8_CLAMP(user_data));
+  };
+  LASoperationCopyAttributeIntoUserData(I32 index) { this->index = index; };
+private:
+  I32 index;
 };
 
 class LASoperationSetPointSource : public LASoperation
@@ -1059,6 +1106,14 @@ public:
   inline void transform(LASpoint* point) { I16 temp = point->get_G(); point->set_G(point->get_B()); point->set_B(temp); };
 };
 
+class LASoperationCopyRintoIntensity : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "copy_R_into_intensity"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline void transform(LASpoint* point) { point->set_intensity(point->get_R()); };
+};
+
 class LASoperationCopyRintoNIR : public LASoperation
 {
 public:
@@ -1067,12 +1122,28 @@ public:
   inline void transform(LASpoint* point) { point->set_NIR(point->get_R()); };
 };
 
+class LASoperationCopyGintoIntensity : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "copy_G_into_intensity"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline void transform(LASpoint* point) { point->set_intensity(point->get_G()); };
+};
+
 class LASoperationCopyGintoNIR : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "copy_G_into_NIR"; };
   inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
   inline void transform(LASpoint* point) { point->set_NIR(point->get_G()); };
+};
+
+class LASoperationCopyBintoIntensity : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "copy_B_into_intensity"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline void transform(LASpoint* point) { point->set_intensity(point->get_B()); };
 };
 
 class LASoperationCopyBintoNIR : public LASoperation
@@ -1227,6 +1298,7 @@ void LAStransform::usage() const
   fprintf(stderr,"  -classify_z_between_as 2.0 5.0 4\n");
   fprintf(stderr,"  -classify_intensity_above_as 200 9\n");
   fprintf(stderr,"  -classify_intensity_below_as 30 11 \n");
+  fprintf(stderr,"  -classify_intensity_between_as 500 900 15\n");
   fprintf(stderr,"  -change_extended_classification_from_to 6 46\n");
   fprintf(stderr,"  -move_ancient_to_extended_classification\n");
   fprintf(stderr,"Change the flags.\n");
@@ -1240,6 +1312,8 @@ void LAStransform::usage() const
   fprintf(stderr,"Modify the user data.\n");
   fprintf(stderr,"  -set_user_data 0\n");
   fprintf(stderr,"  -change_user_data_from_to 23 26\n");
+  fprintf(stderr,"  -change_user_data_from_to 23 26\n");
+  fprintf(stderr,"  -copy_attribute_into_user_data 1\n");
   fprintf(stderr,"Modify the point source ID.\n");
   fprintf(stderr,"  -set_point_source 500\n");
   fprintf(stderr,"  -change_point_source_from_to 1023 1024\n");
@@ -1261,7 +1335,9 @@ void LAStransform::usage() const
   fprintf(stderr,"  -scale_RGB_down (by 256)\n");
   fprintf(stderr,"  -scale_RGB_up (by 256)\n");
   fprintf(stderr,"  -switch_R_G -switch_R_B -switch_B_G\n");
-  fprintf(stderr,"  -copy_R_into_NIR -copy_G_into_NIR -copy_B_into_NIR\n");
+  fprintf(stderr,"  -copy_R_into_NIR -copy_R_into_intensity\n");
+  fprintf(stderr,"  -copy_G_into_NIR -copy_G_into_intensity\n");
+  fprintf(stderr,"  -copy_B_into_NIR -copy_B_into_intensity\n");
 }
 
 BOOL LAStransform::parse(int argc, char* argv[])
@@ -1571,16 +1647,29 @@ BOOL LAStransform::parse(int argc, char* argv[])
     }
     else if (strncmp(argv[i],"-copy_", 6) == 0)
     {
-      if (strcmp(argv[i],"-copy_attribute_into_z") == 0)
+      if (strncmp(argv[i],"-copy_attribute_", 16) == 0)
       {
-        if ((i+1) >= argc)
+        if (strcmp(argv[i],"-copy_attribute_into_z") == 0)
         {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: index of attribute\n", argv[i]);
-          return FALSE;
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: index of attribute\n", argv[i]);
+            return FALSE;
+          }
+          change_coordinates = TRUE;
+          add_operation(new LASoperationCopyAttributeIntoZ(atoi(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
         }
-        change_coordinates = TRUE;
-        add_operation(new LASoperationCopyAttributeIntoZ(atoi(argv[i+1])));
-        *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
+        else if (strcmp(argv[i],"-copy_attribute_into_user_data") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: index of attribute\n", argv[i]);
+            return FALSE;
+          }
+          add_operation(new LASoperationCopyAttributeIntoUserData(atoi(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
+        }
       }
       else if (strncmp(argv[i],"-copy_user_data_", 16) == 0)
       {
@@ -1600,20 +1689,44 @@ BOOL LAStransform::parse(int argc, char* argv[])
         add_operation(new LASoperationCopyScannerChannelIntoPointSource());
         *argv[i]='\0'; 
       }
-      else if (strcmp(argv[i],"-copy_R_into_NIR") == 0)
+      else if (strncmp(argv[i],"-copy_R_", 8) == 0)
       {
-        add_operation(new LASoperationCopyRintoNIR());
-        *argv[i]='\0'; 
+        if (strcmp(argv[i],"-copy_R_into_intensity") == 0)
+        {
+          add_operation(new LASoperationCopyRintoIntensity());
+          *argv[i]='\0'; 
+        }
+        else if (strcmp(argv[i],"-copy_R_into_NIR") == 0)
+        {
+          add_operation(new LASoperationCopyRintoNIR());
+          *argv[i]='\0';
+        }
       }
-      else if (strcmp(argv[i],"-copy_G_into_NIR") == 0)
+      else if (strncmp(argv[i],"-copy_G_", 8) == 0)
       {
-        add_operation(new LASoperationCopyGintoNIR());
-        *argv[i]='\0'; 
+        if (strcmp(argv[i],"-copy_G_into_intensity") == 0)
+        {
+          add_operation(new LASoperationCopyGintoIntensity());
+          *argv[i]='\0'; 
+        }
+        else if (strcmp(argv[i],"-copy_G_into_NIR") == 0)
+        {
+          add_operation(new LASoperationCopyGintoNIR());
+          *argv[i]='\0'; 
+        }
       }
-      else if (strcmp(argv[i],"-copy_B_into_NIR") == 0)
+      else if (strncmp(argv[i],"-copy_B_", 8) == 0)
       {
-        add_operation(new LASoperationCopyBintoNIR());
-        *argv[i]='\0'; 
+        if (strcmp(argv[i],"-copy_B_into_intensity") == 0)
+        {
+          add_operation(new LASoperationCopyBintoIntensity());
+          *argv[i]='\0'; 
+        }
+        else if (strcmp(argv[i],"-copy_B_into_NIR") == 0)
+        {
+          add_operation(new LASoperationCopyBintoNIR());
+          *argv[i]='\0'; 
+        }
       }
       else if (strcmp(argv[i],"-copy_NIR_into_intensity") == 0)
       {
@@ -1624,6 +1737,11 @@ BOOL LAStransform::parse(int argc, char* argv[])
       {
         change_coordinates = TRUE;
         add_operation(new LASoperationCopyIntensityIntoZ());
+        *argv[i]='\0'; 
+      } 
+      else if (strcmp(argv[i],"-copy_classification_into_user_data") == 0)
+      {
+        add_operation(new LASoperationCopyClassificationIntoUserData());
         *argv[i]='\0'; 
       } 
     }
@@ -1874,55 +1992,71 @@ BOOL LAStransform::parse(int argc, char* argv[])
     }
     else if (strncmp(argv[i],"-classify_", 10) == 0)
     {
-      if (strcmp(argv[i],"-classify_z_below_as") == 0)
+      if (strncmp(argv[i],"-classify_z_", 12) == 0)
       {
-        if ((i+2) >= argc)
+        if (strcmp(argv[i],"-classify_z_below_as") == 0)
         {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: z_value classification_code\n", argv[i]);
-          return FALSE;
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: z_value classification_code\n", argv[i]);
+            return FALSE;
+          }
+          add_operation(new LASoperationClassifyZbelowAs(atof(argv[i+1]), U8_CLAMP(atoi(argv[i+2]))));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
         }
-        add_operation(new LASoperationClassifyZbelowAs(atof(argv[i+1]), U8_CLAMP(atoi(argv[i+2]))));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
+        else if (strcmp(argv[i],"-classify_z_above_as") == 0)
+        {
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: z_value classification_code\n", argv[i]);
+            return FALSE;
+          }
+          add_operation(new LASoperationClassifyZaboveAs(atof(argv[i+1]), U8_CLAMP(atoi(argv[i+2]))));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
+        }
+        else if (strcmp(argv[i],"-classify_z_between_as") == 0)
+        {
+          if ((i+3) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: z_min z_max classification_code\n", argv[i]);
+            return FALSE;
+          }
+          add_operation(new LASoperationClassifyZbetweenAs(atof(argv[i+1]), atof(argv[i+2]), U8_CLAMP(atoi(argv[i+3]))));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
+        }
       }
-      else if (strcmp(argv[i],"-classify_z_above_as") == 0)
+      if (strncmp(argv[i],"-classify_intensity_", 20) == 0)
       {
-        if ((i+2) >= argc)
+        if (strcmp(argv[i],"-classify_intensity_below_as") == 0)
         {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: z_value classification_code\n", argv[i]);
-          return FALSE;
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: intensity_value classification_code\n", argv[i]);
+            return FALSE;
+          }
+          add_operation(new LASoperationClassifyIntensityBelowAs(U16_CLAMP(atoi(argv[i+1])), U8_CLAMP(atoi(argv[i+2]))));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
         }
-        add_operation(new LASoperationClassifyZaboveAs(atof(argv[i+1]), U8_CLAMP(atoi(argv[i+2]))));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
-      }
-      else if (strcmp(argv[i],"-classify_z_between_as") == 0)
-      {
-        if ((i+3) >= argc)
+        else if (strcmp(argv[i],"-classify_intensity_above_as") == 0)
         {
-          fprintf(stderr,"ERROR: '%s' needs 3 arguments: z_min z_max classification_code\n", argv[i]);
-          return FALSE;
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: intensity_value classification_code\n", argv[i]);
+            return FALSE;
+          }
+          add_operation(new LASoperationClassifyIntensityAboveAs(U16_CLAMP(atoi(argv[i+1])), (U8)atoi(argv[i+2])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
         }
-        add_operation(new LASoperationClassifyZbetweenAs(atof(argv[i+1]), atof(argv[i+2]), U8_CLAMP(atoi(argv[i+3]))));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
-      }
-      else if (strcmp(argv[i],"-classify_intensity_below_as") == 0)
-      {
-        if ((i+2) >= argc)
+        else if (strcmp(argv[i],"-classify_intensity_between_as") == 0)
         {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: intensity_value classification_code\n", argv[i]);
-          return FALSE;
+          if ((i+3) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: min_intensity_value max_intensity_value classification_code\n", argv[i]);
+            return FALSE;
+          }
+          add_operation(new LASoperationClassifyIntensityBetweenAs(U16_CLAMP(atoi(argv[i+1])), U16_CLAMP(atoi(argv[i+2])), (U8)atoi(argv[i+3])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
         }
-        add_operation(new LASoperationClassifyIntensityBelowAs(U16_CLAMP(atoi(argv[i+1])), U8_CLAMP(atoi(argv[i+2]))));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
-      }
-      else if (strcmp(argv[i],"-classify_intensity_above_as") == 0)
-      {
-        if ((i+2) >= argc)
-        {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: intensity_value classification_code\n", argv[i]);
-          return FALSE;
-        }
-        add_operation(new LASoperationClassifyIntensityAboveAs(U16_CLAMP(atoi(argv[i+1])), (U8)atoi(argv[i+2])));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
       }
     }
     else if (strncmp(argv[i],"-scale_", 7) == 0)

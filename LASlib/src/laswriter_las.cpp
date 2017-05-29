@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2012, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -171,6 +171,14 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
     point_data_record_length = header->point_data_record_length;
   }
 
+  // fail if we don't use the layered compressor for the new LAS 1.4 point types
+  
+  if (compressor && (point_data_format > 5) && (compressor != LASZIP_COMPRESSOR_LAYERED_CHUNKED))
+  {
+    fprintf(stderr,"ERROR: point type %d requires using \"native LAS 1.4 extension\" of LASzip\n", point_data_format);
+    return FALSE;
+  }
+
   // do we need a LASzip VLR (because we compress or use non-standard points?) 
 
   LASzip* laszip = 0;
@@ -181,7 +189,7 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
     laszip->setup(point.num_items, point.items, compressor);
     if (chunk_size > -1) laszip->set_chunk_size((U32)chunk_size);
     if (compressor == LASZIP_COMPRESSOR_NONE) laszip->request_version(0);
-    else if (chunk_size == 0) { fprintf(stderr,"ERROR: adaptive chunking is depricated\n"); return FALSE; }
+    else if (chunk_size == 0 && (point_data_format <= 5)) { fprintf(stderr,"ERROR: adaptive chunking is depricated for point type %d.\n       only available for new LAS 1.4 point types 6 or higher.\n", point_data_format); return FALSE; }
     else if (requested_version) laszip->request_version(requested_version);
     else laszip->request_version(2);
     laszip_vlr_data_size = 34 + 6*laszip->num_items;

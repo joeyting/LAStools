@@ -655,7 +655,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
           lasreaderlas = new LASreaderLASreoffset(offset[0], offset[1], offset[2]);
         else
           lasreaderlas = new LASreaderLASrescalereoffset(scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
-        if (!lasreaderlas->open(file_name, io_ibuffer_size))
+        if (!lasreaderlas->open(file_name, io_ibuffer_size, FALSE, decompress_selective))
         {
           fprintf(stderr,"ERROR: cannot open lasreaderlas with file name '%s'\n", file_name);
           delete lasreaderlas;
@@ -676,9 +676,14 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
         }
         if (filter) lasreaderlas->set_filter(filter);
         if (transform) lasreaderlas->set_transform(transform);
-        if (inside_tile) lasreaderlas->inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
-        if (inside_circle) lasreaderlas->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
+        if (unbuffered && lasreaderlas->header.vlr_lasoriginal)
+        {
+          lasreaderlas->npoints = lasreaderlas->header.vlr_lasoriginal->number_of_point_records;
+          lasreaderlas->header.restore_lasoriginal();
+        }
         if (inside_rectangle) lasreaderlas->inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
+        else if (inside_tile) lasreaderlas->inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
+        else if (inside_circle) lasreaderlas->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
         if (pipe_on)
         {
           LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn();
@@ -957,7 +962,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
             lasreadertxt->add_attribute(attribute_data_types[i], attribute_names[i], attribute_descriptions[i], attribute_scales[i], attribute_offsets[i], attribute_pre_scales[i], attribute_pre_offsets[i], attribute_no_datas[i]);
           }
         }
-        if (!lasreadertxt->open(file_name, parse_string, skip_lines, populate_header))
+        if (!lasreadertxt->open(file_name, point_type, parse_string, skip_lines, populate_header))
         {
           fprintf(stderr,"ERROR: cannot open lasreadertxt with file name '%s'\n", file_name);
           delete lasreadertxt;
@@ -1008,7 +1013,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
           lasreadertxt->add_attribute(attribute_data_types[i], attribute_names[i], attribute_descriptions[i], attribute_scales[i], attribute_offsets[i], attribute_pre_scales[i], attribute_pre_offsets[i], attribute_no_datas[i]);
         }
       }
-      if (!lasreadertxt->open(stdin, 0, parse_string, skip_lines, FALSE))
+      if (!lasreadertxt->open(stdin, 0, point_type, parse_string, skip_lines, FALSE))
       {
         fprintf(stderr,"ERROR: cannot open lasreadertxt with file name '%s'\n", file_name);
         delete lasreadertxt;
@@ -1145,14 +1150,14 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered)
       if (strstr(file_name, ".las") || strstr(file_name, ".laz") || strstr(file_name, ".LAS") || strstr(file_name, ".LAZ"))
       {
         LASreaderLAS* lasreaderlas = (LASreaderLAS*)lasreader;
-        if (!lasreaderlas->open(file_name, io_ibuffer_size))
+        if (!lasreaderlas->open(file_name, io_ibuffer_size, FALSE, decompress_selective))
         {
           fprintf(stderr,"ERROR: cannot reopen lasreaderlas with file name '%s'\n", file_name);
           return FALSE;
         }
-        if (!remain_buffered)
+        if (!remain_buffered && lasreaderlas->header.vlr_lasoriginal)
         {
-          if (lasreaderlas->header.vlr_lasoriginal) lasreaderlas->npoints = lasreaderlas->header.vlr_lasoriginal->number_of_point_records;
+          lasreaderlas->npoints = lasreaderlas->header.vlr_lasoriginal->number_of_point_records;
           lasreaderlas->header.restore_lasoriginal();
         }
         if (inside_rectangle || inside_tile || inside_circle)
@@ -1638,6 +1643,11 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
       set_buffer_size((F32)atof(argv[i+1]));
       *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
     }
+    else if (strcmp(argv[i],"-unbuffered") == 0)
+    {
+      set_unbuffered(TRUE);
+      *argv[i]='\0';
+    }
     else if (strcmp(argv[i],"-temp_files") == 0)
     {
       if ((i+1) >= argc)
@@ -1889,7 +1899,7 @@ void LASreadOpener::set_merged(const BOOL merged)
   this->merged = merged;
 }
 
-void LASreadOpener::set_buffer_size(F32 buffer_size)
+void LASreadOpener::set_buffer_size(const F32 buffer_size)
 {
   this->buffer_size = buffer_size;
 }
@@ -1897,6 +1907,11 @@ void LASreadOpener::set_buffer_size(F32 buffer_size)
 F32 LASreadOpener::get_buffer_size() const
 {
   return buffer_size;
+}
+
+void LASreadOpener::set_unbuffered(const BOOL unbuffered)
+{
+  this->unbuffered = unbuffered;
 }
 
 void LASreadOpener::set_filter(LASfilter* filter)
@@ -2136,6 +2151,16 @@ BOOL LASreadOpener::add_neighbor_file_name(const CHAR* neighbor_file_name, BOOL 
   return TRUE;
 }
 
+BOOL LASreadOpener::set_point_type(U8 point_type)
+{
+  if (point_type > 10)
+  {
+    return FALSE;
+  }
+  this->point_type = point_type;
+  return TRUE;
+}
+
 void LASreadOpener::set_parse_string(const CHAR* parse_string)
 {
   if (this->parse_string) free(this->parse_string);
@@ -2239,6 +2264,15 @@ void LASreadOpener::set_pipe_on(BOOL pipe_on)
   this->pipe_on = pipe_on;
 }
 
+void LASreadOpener::set_decompress_selective(U32 decompress_selective)
+{
+  this->decompress_selective = decompress_selective;
+  if (filter)
+  {
+    this->decompress_selective |= filter->get_decompress_selective();
+  }
+}
+
 void LASreadOpener::set_inside_tile(const F32 ll_x, const F32 ll_y, const F32 size)
 {
   if (inside_tile == 0) inside_tile = new F32[3];
@@ -2281,6 +2315,7 @@ LASreadOpener::LASreadOpener()
   scale_factor = 0;
   offset = 0;
   buffer_size = 0.0f;
+  unbuffered = FALSE;
   auto_reoffset = FALSE;
   files_are_flightlines = FALSE;
   apply_file_source_ID = FALSE;
@@ -2303,6 +2338,7 @@ LASreadOpener::LASreadOpener()
     attribute_pre_offsets[i] = 0.0;
     attribute_no_datas[i] = F64_MAX;
   }
+  point_type = 0;
   parse_string = 0;
   skip_lines = 0;
   populate_header = FALSE;
@@ -2314,6 +2350,7 @@ LASreadOpener::LASreadOpener()
   file_name_current = 0;
   neighbor_file_name_number = 0;
   neighbor_file_name_allocated = 0;
+  decompress_selective = LASZIP_DECOMPRESS_SELECTIVE_ALL;
   inside_tile = 0;
   inside_circle = 0;
   inside_rectangle = 0;

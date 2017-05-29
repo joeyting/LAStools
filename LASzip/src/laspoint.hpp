@@ -257,7 +257,7 @@ public:
     }
   };
 
-  // these functions set the desired point format (and maybe add on attributes in extra bytes)
+// these functions set the desired point format (and maybe add on attributes in extra bytes)
 
   BOOL init(const LASquantizer* quantizer, const U8 point_type, const U16 point_size, const LASattributer* attributer=0)
   {
@@ -296,14 +296,17 @@ public:
       case LASitem::RGBNIR14:
         have_nir = TRUE;
       case LASitem::RGB12:
+      case LASitem::RGB14:
         have_rgb = TRUE;
         this->point[i] = (U8*)(this->rgb);
         break;
       case LASitem::WAVEPACKET13:
+      case LASitem::WAVEPACKET14:
         have_wavepacket = TRUE;
         this->point[i] = (U8*)&(this->wavepacket);
         break;
       case LASitem::BYTE:
+      case LASitem::BYTE14:
         extra_bytes_number = items[i].size;
         extra_bytes = new U8[extra_bytes_number];
         this->point[i] = extra_bytes;
@@ -352,14 +355,17 @@ public:
       case LASitem::RGBNIR14:
         have_nir = TRUE;
       case LASitem::RGB12:
+      case LASitem::RGB14:
         have_rgb = TRUE;
         this->point[i] = (U8*)(this->rgb);
         break;
       case LASitem::WAVEPACKET13:
+      case LASitem::WAVEPACKET14:
         have_wavepacket = TRUE;
         this->point[i] = (U8*)&(this->wavepacket);
         break;
       case LASitem::BYTE:
+      case LASitem::BYTE14:
         extra_bytes_number = items[i].size;
         extra_bytes = new U8[extra_bytes_number];
         this->point[i] = extra_bytes;
@@ -514,7 +520,6 @@ public:
 
     // LAS 1.4 only
     extended_point_type = 0;
-
   };
 
   LASpoint()
@@ -556,7 +561,7 @@ public:
   inline U16 get_B() const { return rgb[2]; };
   inline U16 get_I() const { return rgb[3]; };
   inline U16 get_NIR() const { return rgb[3]; };
-
+  
   inline void set_X(const I32 X) { this->X = X; };
   inline void set_Y(const I32 Y) { this->Y = Y; };
   inline void set_Z(const I32 Z) { this->Z = Z; };
@@ -598,6 +603,8 @@ public:
   inline U8 get_extended_scanner_channel() const { return extended_scanner_channel; };
 
   inline void set_extended_classification(U8 extended_classification) { this->extended_classification = extended_classification; };
+  inline void set_extended_return_number(U8 extended_return_number) { this->extended_return_number = extended_return_number; };
+  inline void set_extended_number_of_returns(U8 extended_number_of_returns) { this->extended_number_of_returns = extended_number_of_returns; };
   inline void set_extended_scan_angle(I16 extended_scan_angle) { this->extended_scan_angle = extended_scan_angle; };
   inline void set_extended_overlap_flag(U8 extended_overlap_flag) { this->extended_classification_flags = (extended_overlap_flag << 3) | (this->extended_classification_flags & 7); };
   inline void set_extended_scanner_channel(U8 extended_scanner_channel) { this->extended_scanner_channel = extended_scanner_channel; };
