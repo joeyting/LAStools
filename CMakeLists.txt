@@ -15,7 +15,7 @@ file( GLOB LASZIP_SOURCES "${CMAKE_SOURCE_DIR}/LASzip/src/*.cpp")
 add_library( las SHARED ${LASLIB_SOURCES} ${LASZIP_SOURCES} )
 
 install(TARGETS las
-        LIBRARY DESTINATION lib)
+         DESTINATION lib)
 install(DIRECTORY LASlib/inc/ DESTINATION include/LASlib
         FILES_MATCHING PATTERN "*.hpp")
 install(DIRECTORY LASzip/src/ DESTINATION include/LASzip
