@@ -46,6 +46,11 @@
 
 #ifdef UNORDERED
    // Figure out whether <unordered_map> is in tr1
+#if (_MSC_VER >= 1700)
+  #include <unordered_map>
+  using namespace std;
+  #define UNORDERED_FOUND
+#else 
 #  ifdef __has_include
 #    if __has_include(<unordered_map>)
 #     include <unordered_map>
@@ -53,6 +58,8 @@
 #     define UNORDERED_FOUND
 #    endif
 #  endif
+#endif //MSC_VER
+
 #  ifndef UNORDERED_FOUND
 #    include <tr1/unordered_map>
     using namespace std;
