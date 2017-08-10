@@ -1,3 +1,17 @@
+18 July 2017 -- LASzip + LASlib: bug fix for spatially-indexed reading from native compressed LAS 1.4 files
+14 July 2017 -- las2las: fixed missing 'comma' in compound (COMPD_CS) OGC WKT string 
+13 July 2017 -- lasdiff: added missing checks for LAS 1.4 EVLR size and payloads
+10 July 2017 -- lasground, lasground_new, lasheight: amount of console output controlled with '-verbose' or '-quiet'
+5 July 2017 -- lasreturn: option '-repair_number_of_returns' now also works for new LAS 1.4 point types 6 to 10
+28 June 2017 -- lasgrid, las2dem, blast2dem, lascanopy: fixed quantization bug in X/Y coords for LAZ grid output
+28 June 2017 -- lasgrid, las2dem, blast2dem, lascanopy: no more bug for unlicensed writing (black-diagonal) 
+25 June 2017 -- lascolor: fix inability to read a certain type of tiled 4-band TIF images
+24 June 2017 -- lasgrid, las2dem, lascanopy: correct *unsigned* output for 16 bit '-intensity' for '-no_data 0'
+24 June 2017 -- LASlib: corrected on-the-fly conversion from BIL rasters to point clouds for unsigned integers
+23 June 2017 -- lasnoise: fixed that '-ignore_class 8' did not ignore points during isolated computation
+22 June 2017 -- laslayers: added ability to run on multiple '-cores 7'
+18 June 2017 -- lasboundary + all GUIs: fixed "small polygons missing bug" in '-use_lax' mode and in GUI previews
+8 June 2017 -- lasclassify: IMPORTANT BUG FIX (but only if you downloaded version 170528 where it was introduced)
 28 May 2017 -- LASzip DLL: support for "selective decompression" of compressed LAS 1.4 points added into DLL API
 27 May 2017 -- lascontrol: let '-odir quality' specify where error report '-cp_out cp_check.csv' will be stored 
 21 May 2017 -- lasgrid: fixed BIL output for the '-point_density' option. now '-density' means '-point_density'.
