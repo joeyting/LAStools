@@ -2,6 +2,9 @@ project ( LAS )
 
 cmake_minimum_required(VERSION 2.8.11)
 
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 # definitions for VC++
 add_definitions( -DCOMPILE_AS_DLL  -D_CRT_SECURE_NO_WARNINGS )
 
