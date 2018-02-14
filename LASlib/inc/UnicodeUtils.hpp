@@ -7,17 +7,6 @@
 */
 #pragma once
 
-//#define LAS_TOOLS_VERSION 170805
-//
-//#include <stdio.h>
-//#include <string.h>
-//#include <stdlib.h>
-//#include <assert.h>
-//
-//#include "mydefs.hpp"
-//#include "laszip.hpp"
-//#include "laspoint.hpp"
-
 #ifdef _WIN32
 #include <string>
 #include <windows.h>
