@@ -79,7 +79,7 @@ public:
 	{
 		// open input file
 #ifdef _WIN32
-		return _wfopen(towstring(filename).c_str(), towstring(mode).c_str());// wstrMode.c_str());
+		return _wfopen(towstring(filename).c_str(), towstring(mode).c_str());
 #else
 		return fopen(filename, mode);
 #endif
