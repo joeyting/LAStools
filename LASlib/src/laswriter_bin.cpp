@@ -31,6 +31,7 @@
 #include "laswriter_bin.hpp"
 
 #include "bytestreamout_file.hpp"
+#include "UnicodeUtils.hpp"
 
 #ifdef _WIN32
 #include <fcntl.h>
@@ -93,7 +94,7 @@ BOOL LASwriterBIN::open(const char* file_name, const LASheader* header, const ch
     return FALSE;
   }
 
-  file = fopen(file_name, "wb");
+  file = UnicodeUtils::open(file_name, "wb");
 
   if (file == 0)
   {

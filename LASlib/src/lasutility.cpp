@@ -29,6 +29,7 @@
 ===============================================================================
 */
 #include "lasutility.hpp"
+#include "UnicodeUtils.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -1510,7 +1511,8 @@ void LASoccupancyGrid::reset()
 
 BOOL LASoccupancyGrid::write_asc_grid(const CHAR* file_name) const
 {
-  FILE* file = fopen(file_name, "w");
+  FILE*   file = UnicodeUtils::open(file_name, "w");;
+
   if (file == 0) return FALSE;
   fprintf(file, "ncols %d\012", max_x-min_x+1);
   fprintf(file, "nrows %d\012", max_y-min_y+1);

@@ -29,6 +29,7 @@
 ===============================================================================
 */
 #include "laswriter_txt.hpp"
+#include "UnicodeUtils.hpp"
 
 #include <stdlib.h>
 #include <string.h>
@@ -62,7 +63,7 @@ BOOL LASwriterTXT::open(const CHAR* file_name, const LASheader* header, const CH
     return FALSE;
   }
 
-  file = fopen(file_name, "w");
+  file = UnicodeUtils::open(file_name, "w");
 
   if (file == 0)
   {

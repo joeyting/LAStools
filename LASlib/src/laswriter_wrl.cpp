@@ -29,10 +29,10 @@
 ===============================================================================
 */
 #include "laswriter_wrl.hpp"
+#include "UnicodeUtils.hpp"
 
 #include <stdlib.h>
 #include <string.h>
-
 
 BOOL LASwriterWRL::open(const CHAR* file_name, const LASheader* header, const CHAR* parse_string)
 {
@@ -42,7 +42,7 @@ BOOL LASwriterWRL::open(const CHAR* file_name, const LASheader* header, const CH
     return FALSE;
   }
 
-  file = fopen(file_name, "w");
+  file = UnicodeUtils::open(file_name, "w");
 
   if (file == 0)
   {

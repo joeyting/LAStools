@@ -29,6 +29,7 @@
 ===============================================================================
 */
 #include "laswriter_las.hpp"
+#include "UnicodeUtils.hpp"
 
 #include "bytestreamout_nil.hpp"
 #include "bytestreamout_file.hpp"
@@ -64,7 +65,8 @@ BOOL LASwriterLAS::open(const char* file_name, const LASheader* header, U32 comp
     return FALSE;
   }
 
-  file = fopen(file_name, "wb");
+  file = UnicodeUtils::open(file_name, "wb");
+
   if (file == 0)
   {
     fprintf(stderr, "ERROR: cannot open file '%s'\n", file_name);

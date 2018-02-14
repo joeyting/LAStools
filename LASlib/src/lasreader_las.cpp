@@ -29,6 +29,7 @@
 ===============================================================================
 */
 #include "lasreader_las.hpp"
+#include "UnicodeUtils.hpp"
 
 #include "bytestreamin.hpp"
 #include "bytestreamin_file.hpp"
@@ -41,18 +42,21 @@
 #include <io.h>
 #endif
 
+#include <memory>
+
 #include <stdlib.h>
 #include <string.h>
 
-BOOL LASreaderLAS::open(const char* file_name, I32 io_buffer_size, BOOL peek_only, U32 decompress_selective)
+BOOL LASreaderLAS::open(const CHAR* file_name, I32 io_buffer_size, BOOL peek_only, U32 decompress_selective)
 {
   if (file_name == 0)
   {
     fprintf(stderr,"ERROR: file name pointer is zero\n");
     return FALSE;
   }
+  
+  file = UnicodeUtils::open(file_name, "rb");
 
-  file = fopen(file_name, "rb");
   if (file == 0)
   {
     fprintf(stderr, "ERROR: cannot open file '%s'\n", file_name);

@@ -29,6 +29,7 @@
 ===============================================================================
 */
 #include "lasreader_dtm.hpp"
+#include "UnicodeUtils.hpp"
 
 // used to map GeoTIFF codes to GCTP codes
 
@@ -282,6 +283,7 @@ static const unsigned short GCTP_NAD83_Puerto_Rico = 5200;
 #include <string.h>
 
 #ifdef _WIN32
+#include <string>
 #include <windows.h>
 #endif
 
@@ -298,8 +300,8 @@ BOOL LASreaderDTM::open(const CHAR* file_name)
   clean();
 
   // open the DTM file
+  file = UnicodeUtils::open(file_name, "rb");
 
-  file = fopen(file_name, "rb");
   if (file == 0)
   {
     fprintf(stderr, "ERROR: cannot open file '%s'\n", file_name);
@@ -1324,7 +1326,8 @@ BOOL LASreaderDTM::reopen(const CHAR* file_name)
     file = 0;
   }
 
-  file = fopen(file_name, "rb");
+  file = UnicodeUtils::open(file_name, "rb");
+
   if (file == 0)
   {
     fprintf(stderr, "ERROR: cannot reopen file '%s'\n", file_name);

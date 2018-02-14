@@ -45,6 +45,7 @@
 #include "lasreadermerged.hpp"
 #include "lasreaderbuffered.hpp"
 #include "lasreaderpipeon.hpp"
+#include "UnicodeUtils.hpp"
 
 #include <stdlib.h>
 #include <string.h>
@@ -484,7 +485,7 @@ BOOL LASreadOpener::is_buffered() const
 
 BOOL LASreadOpener::is_header_populated() const
 {
-  return (populate_header || (file_name && (strstr(file_name, ".las") || strstr(file_name, ".laz") || strstr(file_name, ".LAS") || strstr(file_name, ".LAZ"))));
+  return (populate_header || (file_name && (UnicodeUtils::strstr(file_name, ".las") || UnicodeUtils::strstr(file_name, ".laz") || UnicodeUtils::strstr(file_name, ".LAS") || UnicodeUtils::strstr(file_name, ".LAZ"))));
 }
 
 void LASreadOpener::reset()
@@ -583,7 +584,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
       }
       for (i = 0; i < neighbor_file_name_number; i++)
       {
-        if (strcmp(file_name, neighbor_file_names[i]))
+        if (UnicodeUtils::strcmp(file_name, neighbor_file_names[i]))
         {
           lasreaderbuffered->add_neighbor_file_name(neighbor_file_names[i]);
         }
@@ -634,7 +635,8 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
       {
         transform->setPointSource(file_name_current);
       }
-      if (strstr(file_name, ".las") || strstr(file_name, ".laz") || strstr(file_name, ".LAS") || strstr(file_name, ".LAZ"))
+
+      if (UnicodeUtils::strstr(file_name, ".las") || UnicodeUtils::strstr(file_name, ".laz") || UnicodeUtils::strstr(file_name, ".LAS") || UnicodeUtils::strstr(file_name, ".LAZ"))
       {
         LASreaderLAS* lasreaderlas;
         if (scale_factor == 0 && offset == 0)
@@ -695,7 +697,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
           return lasreaderlas;
         }
       }
-      else if (strstr(file_name, ".bin") || strstr(file_name, ".BIN"))
+      else if (UnicodeUtils::strstr(file_name, ".bin") || UnicodeUtils::strstr(file_name, ".BIN"))
       {
         LASreaderBIN* lasreaderbin;
         if (scale_factor == 0 && offset == 0)
@@ -739,7 +741,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
           return lasreaderbin;
         }
       }
-      else if (strstr(file_name, ".shp") || strstr(file_name, ".SHP"))
+      else if (UnicodeUtils::strstr(file_name, ".shp") || UnicodeUtils::strstr(file_name, ".SHP"))
       {
         LASreaderSHP* lasreadershp;
         if (scale_factor == 0 && offset == 0)
@@ -778,7 +780,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
           return lasreadershp;
         }
       }
-      else if (strstr(file_name, ".qi") || strstr(file_name, ".QI"))
+      else if (UnicodeUtils::strstr(file_name, ".qi") || UnicodeUtils::strstr(file_name, ".QI"))
       {
         LASreaderQFIT* lasreaderqfit;
         if (scale_factor == 0 && offset == 0)
@@ -822,7 +824,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
           return lasreaderqfit;
         }
       }
-      else if (strstr(file_name, ".asc") || strstr(file_name, ".ASC"))
+      else if (UnicodeUtils::strstr(file_name, ".asc") || UnicodeUtils::strstr(file_name, ".ASC"))
       {
         LASreaderASC* lasreaderasc;
         if (scale_factor == 0 && offset == 0)
@@ -861,7 +863,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
           return lasreaderasc;
         }
       }
-      else if (strstr(file_name, ".bil") || strstr(file_name, ".BIL"))
+      else if (UnicodeUtils::strstr(file_name, ".bil") || UnicodeUtils::strstr(file_name, ".BIL"))
       {
         LASreaderBIL* lasreaderbil;
         if (scale_factor == 0 && offset == 0)
@@ -900,7 +902,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
           return lasreaderbil;
         }
       }
-      else if (strstr(file_name, ".dtm") || strstr(file_name, ".DTM"))
+      else if (UnicodeUtils::strstr(file_name, ".dtm") || UnicodeUtils::strstr(file_name, ".DTM"))
       {
         LASreaderDTM* lasreaderdtm;
         if (scale_factor == 0 && offset == 0)
@@ -1142,7 +1144,7 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered)
     else
     {
       if (!file_name) return FALSE;
-      if (strstr(file_name, ".las") || strstr(file_name, ".laz") || strstr(file_name, ".LAS") || strstr(file_name, ".LAZ"))
+      if (UnicodeUtils::strstr(file_name, ".las") || UnicodeUtils::strstr(file_name, ".laz") || UnicodeUtils::strstr(file_name, ".LAS") || UnicodeUtils::strstr(file_name, ".LAZ"))
       {
         LASreaderLAS* lasreaderlas = (LASreaderLAS*)lasreader;
         if (!lasreaderlas->open(file_name, io_ibuffer_size, FALSE, decompress_selective))
@@ -1159,7 +1161,7 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered)
         }
         return TRUE;
       }
-      else if (strstr(file_name, ".bin") || strstr(file_name, ".BIN"))
+      else if (UnicodeUtils::strstr(file_name, ".bin") || UnicodeUtils::strstr(file_name, ".BIN"))
       {
         LASreaderBIN* lasreaderbin = (LASreaderBIN*)lasreader;
         if (!lasreaderbin->open(file_name))
@@ -1176,7 +1178,7 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered)
         }
         return TRUE;
       }
-      else if (strstr(file_name, ".shp") || strstr(file_name, ".SHP"))
+      else if (UnicodeUtils::strstr(file_name, ".shp") || UnicodeUtils::strstr(file_name, ".SHP"))
       {
         LASreaderSHP* lasreadershp = (LASreaderSHP*)lasreader;
         if (!lasreadershp->reopen(file_name))
@@ -1193,7 +1195,7 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered)
         }
         return TRUE;
       }
-      else if (strstr(file_name, ".qi") || strstr(file_name, ".QI"))
+      else if (UnicodeUtils::strstr(file_name, ".qi") || UnicodeUtils::strstr(file_name, ".QI"))
       {
         LASreaderQFIT* lasreaderqfit = (LASreaderQFIT*)lasreader;
         if (!lasreaderqfit->reopen(file_name))
@@ -1210,7 +1212,7 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered)
         }
         return TRUE;
       }
-      else if (strstr(file_name, ".asc") || strstr(file_name, ".ASC"))
+      else if (UnicodeUtils::strstr(file_name, ".asc") || UnicodeUtils::strstr(file_name, ".ASC"))
       {
         LASreaderASC* lasreaderasc = (LASreaderASC*)lasreader;
         if (!lasreaderasc->reopen(file_name))
@@ -1227,7 +1229,7 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered)
         }
         return TRUE;
       }
-      else if (strstr(file_name, ".bil") || strstr(file_name, ".BIL"))
+      else if (UnicodeUtils::strstr(file_name, ".bil") || UnicodeUtils::strstr(file_name, ".BIL"))
       {
         LASreaderBIL* lasreaderbil = (LASreaderBIL*)lasreader;
         if (!lasreaderbil->reopen(file_name))
@@ -1244,7 +1246,7 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered)
         }
         return TRUE;
       }
-      else if (strstr(file_name, ".dtm") || strstr(file_name, ".DTM"))
+      else if (UnicodeUtils::strstr(file_name, ".dtm") || UnicodeUtils::strstr(file_name, ".DTM"))
       {
         LASreaderDTM* lasreaderdtm = (LASreaderDTM*)lasreader;
         if (!lasreaderdtm->reopen(file_name))
@@ -1346,14 +1348,14 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
     {
       continue;
     }
-    else if (strcmp(argv[i],"-h") == 0)
+    else if (UnicodeUtils::strcmp(argv[i],"-h") == 0)
     {
       LASfilter().usage();
       LAStransform().usage();
       usage();
       return TRUE;
     }
-    else if (strcmp(argv[i],"-i") == 0)
+    else if (UnicodeUtils::strcmp(argv[i],"-i") == 0)
     {
       if ((i+1) >= argc)
       {
@@ -1370,14 +1372,14 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
       } while (i < argc && *argv[i] != '-');
       i-=1;
     }
-    else if (strcmp(argv[i],"-unique") == 0)
+    else if (UnicodeUtils::strcmp(argv[i],"-unique") == 0)
     {
       unique = TRUE;
       *argv[i]='\0';
     }
     else if (strncmp(argv[i],"-inside", 7) == 0)
     {
-      if (strcmp(argv[i],"-inside_tile") == 0)
+      if (UnicodeUtils::strcmp(argv[i],"-inside_tile") == 0)
       {
         if ((i+3) >= argc)
         {
@@ -1387,7 +1389,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
         set_inside_tile((F32)atof(argv[i+1]), (F32)atof(argv[i+2]), (F32)atof(argv[i+3]));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
       }
-      else if (strcmp(argv[i],"-inside_circle") == 0)
+      else if (UnicodeUtils::strcmp(argv[i],"-inside_circle") == 0)
       {
         if ((i+3) >= argc)
         {
@@ -1397,7 +1399,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
         set_inside_circle(atof(argv[i+1]), atof(argv[i+2]), atof(argv[i+3]));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3;
       }
-      else if (strcmp(argv[i],"-inside") == 0 || strcmp(argv[i],"-inside_rectangle") == 0)
+      else if (UnicodeUtils::strcmp(argv[i],"-inside") == 0 || UnicodeUtils::strcmp(argv[i],"-inside_rectangle") == 0)
       {
         if ((i+4) >= argc)
         {
@@ -1413,17 +1415,17 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
         return FALSE;
       }
     }
-    else if (strcmp(argv[i],"-comma_not_point") == 0)
+    else if (UnicodeUtils::strcmp(argv[i],"-comma_not_point") == 0)
     {
       comma_not_point = TRUE;
       *argv[i]='\0';
     }
-    else if (strcmp(argv[i],"-stdin") == 0)
+    else if (UnicodeUtils::strcmp(argv[i],"-stdin") == 0)
     {
       use_stdin = TRUE;
       *argv[i]='\0';
     }
-    else if (strcmp(argv[i],"-lof") == 0)
+    else if (UnicodeUtils::strcmp(argv[i],"-lof") == 0)
     {
       if ((i+1) >= argc)
       {
@@ -1437,7 +1439,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
       }
       *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
     }
-    else if (strcmp(argv[i],"-rescale") == 0)
+    else if (UnicodeUtils::strcmp(argv[i],"-rescale") == 0)
     {
       if ((i+3) >= argc)
       {
@@ -1451,7 +1453,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
       set_scale_factor(scale_factor);
       *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3;
     }
-    else if (strcmp(argv[i],"-rescale_xy") == 0)
+    else if (UnicodeUtils::strcmp(argv[i],"-rescale_xy") == 0)
     {
       if ((i+2) >= argc)
       {
@@ -1465,7 +1467,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
       set_scale_factor(scale_factor);
       *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
     }
-    else if (strcmp(argv[i],"-rescale_z") == 0)
+    else if (UnicodeUtils::strcmp(argv[i],"-rescale_z") == 0)
     {
       if ((i+1) >= argc)
       {
@@ -1479,7 +1481,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
       set_scale_factor(scale_factor);
       *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
     }
-    else if (strcmp(argv[i],"-reoffset") == 0)
+    else if (UnicodeUtils::strcmp(argv[i],"-reoffset") == 0)
     {
       if ((i+3) >= argc)
       {
@@ -1493,22 +1495,22 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
       set_offset(offset);
       *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3;
     }
-    else if (strcmp(argv[i],"-auto_reoffset") == 0)
+    else if (UnicodeUtils::strcmp(argv[i],"-auto_reoffset") == 0)
     {
       set_auto_reoffset(TRUE);
       *argv[i]='\0';
     }
-    else if (strcmp(argv[i],"-files_are_flightlines") == 0 || strcmp(argv[i],"-faf") == 0)
+    else if (UnicodeUtils::strcmp(argv[i],"-files_are_flightlines") == 0 || UnicodeUtils::strcmp(argv[i],"-faf") == 0)
     {
       set_files_are_flightlines(TRUE);
       *argv[i]='\0';
     }
-    else if (strcmp(argv[i],"-apply_file_source_ID") == 0)
+    else if (UnicodeUtils::strcmp(argv[i],"-apply_file_source_ID") == 0)
     {
       set_apply_file_source_ID(TRUE);
       *argv[i]='\0';
     }
-    else if (strcmp(argv[i],"-itranslate_intensity") == 0)
+    else if (UnicodeUtils::strcmp(argv[i],"-itranslate_intensity") == 0)
     {
       if ((i+1) >= argc)
       {
@@ -1518,7 +1520,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
       set_translate_intensity((F32)atof(argv[i+1]));
       *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
     }
-    else if (strcmp(argv[i],"-iscale_intensity") == 0)
+    else if (UnicodeUtils::strcmp(argv[i],"-iscale_intensity") == 0)
     {
       if ((i+1) >= argc)
       {
@@ -1528,7 +1530,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
       set_scale_intensity((F32)atof(argv[i+1]));
       *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
     }
-    else if (strcmp(argv[i],"-itranslate_scan_angle") == 0)
+    else if (UnicodeUtils::strcmp(argv[i],"-itranslate_scan_angle") == 0)
     {
       if ((i+1) >= argc)
       {
@@ -1538,7 +1540,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
       set_translate_scan_angle((F32)atof(argv[i+1]));
       *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
     }
-    else if (strcmp(argv[i],"-iscale_scan_angle") == 0)
+    else if (UnicodeUtils::strcmp(argv[i],"-iscale_scan_angle") == 0)
     {
       if ((i+1) >= argc)
       {
@@ -1548,7 +1550,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
       set_scale_scan_angle((F32)atof(argv[i+1]));
       *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
     }
-    else if (strcmp(argv[i],"-iadd_extra") == 0 || strcmp(argv[i],"-iadd_attribute") == 0)
+    else if (UnicodeUtils::strcmp(argv[i],"-iadd_extra") == 0 || UnicodeUtils::strcmp(argv[i],"-iadd_attribute") == 0)
     {
       if ((i+3) >= argc)
       {
@@ -1557,13 +1559,13 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
       }
       if (((i+4) < argc) && (atof(argv[i+4]) != 0.0))
       {
-        if (((i+5) < argc) && ((atof(argv[i+5]) != 0.0) || (strcmp(argv[i+5], "0") == 0) || (strcmp(argv[i+5], "0.0") == 0)))
+        if (((i+5) < argc) && ((atof(argv[i+5]) != 0.0) || (UnicodeUtils::strcmp(argv[i+5], "0") == 0) || (UnicodeUtils::strcmp(argv[i+5], "0.0") == 0)))
         {
           if (((i+6) < argc) && (atof(argv[i+6]) != 0.0))
           {
-            if (((i+7) < argc) && ((atof(argv[i+7]) != 0.0) || (strcmp(argv[i+7], "0") == 0) || (strcmp(argv[i+7], "0.0") == 0)))
+            if (((i+7) < argc) && ((atof(argv[i+7]) != 0.0) || (UnicodeUtils::strcmp(argv[i+7], "0") == 0) || (UnicodeUtils::strcmp(argv[i+7], "0.0") == 0)))
             {
-              if (((i+8) < argc) && ((atof(argv[i+8]) != 0.0) || (strcmp(argv[i+8], "0") == 0) || (strcmp(argv[i+8], "0.0") == 0)))
+              if (((i+8) < argc) && ((atof(argv[i+8]) != 0.0) || (UnicodeUtils::strcmp(argv[i+8], "0") == 0) || (UnicodeUtils::strcmp(argv[i+8], "0.0") == 0)))
               {
                 add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3], atof(argv[i+4]), atof(argv[i+5]), atof(argv[i+6]), atof(argv[i+7]), atof(argv[i+8]));
                 *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; *argv[i+5]='\0'; *argv[i+6]='\0'; *argv[i+7]='\0'; *argv[i+8]='\0'; i+=8;
@@ -1598,7 +1600,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3;
       }
     }
-    else if (strcmp(argv[i],"-iparse") == 0)
+    else if (UnicodeUtils::strcmp(argv[i],"-iparse") == 0)
     {
       if ((i+1) >= argc)
       {
@@ -1608,7 +1610,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
       set_parse_string(argv[i+1]);
       *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
     }
-    else if (strcmp(argv[i],"-iskip") == 0)
+    else if (UnicodeUtils::strcmp(argv[i],"-iskip") == 0)
     {
       if ((i+1) >= argc)
       {
@@ -1618,12 +1620,12 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
       set_skip_lines(atoi(argv[i+1]));
       *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
     }
-    else if (strcmp(argv[i],"-merged") == 0)
+    else if (UnicodeUtils::strcmp(argv[i],"-merged") == 0)
     {
       set_merged(TRUE);
       *argv[i]='\0';
     }
-    else if (strcmp(argv[i],"-buffered") == 0)
+    else if (UnicodeUtils::strcmp(argv[i],"-buffered") == 0)
     {
       if ((i+1) >= argc)
       {
@@ -1633,7 +1635,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
       set_buffer_size((F32)atof(argv[i+1]));
       *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
     }
-    else if (strcmp(argv[i],"-temp_files") == 0)
+    else if (UnicodeUtils::strcmp(argv[i],"-temp_files") == 0)
     {
       if ((i+1) >= argc)
       {
@@ -1643,7 +1645,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
       temp_file_base = strdup(argv[i+1]);
       *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
     }
-    else if (strcmp(argv[i],"-neighbors") == 0)
+    else if (UnicodeUtils::strcmp(argv[i],"-neighbors") == 0)
     {
       if ((i+1) >= argc)
       {
@@ -1660,14 +1662,16 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
       } while (i < argc && *argv[i] != '-');
       i-=1;
     }
-    else if (strcmp(argv[i],"-neighbors_lof") == 0)
+    else if (UnicodeUtils::strcmp(argv[i],"-neighbors_lof") == 0)
     {
       if ((i+1) >= argc)
       {
         fprintf(stderr,"ERROR: '%s' needs at least 1 argument: file_name\n", argv[i]);
         return FALSE;
       }
-      FILE* file = fopen(argv[i+1], "r");
+
+	  FILE* file = UnicodeUtils::open(argv[i+1], "r");
+
       if (file == 0)
       {
         fprintf(stderr, "ERROR: cannot open '%s'\n", argv[i+1]);
@@ -1693,17 +1697,17 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
       fclose(file);
       *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
     }
-    else if (strcmp(argv[i],"-pipe_on") == 0)
+    else if (UnicodeUtils::strcmp(argv[i],"-pipe_on") == 0)
     {
       set_pipe_on(TRUE);
       *argv[i]='\0';
     }
-    else if (strcmp(argv[i],"-populate") == 0)
+    else if (UnicodeUtils::strcmp(argv[i],"-populate") == 0)
     {
       set_populate_header(TRUE);
       *argv[i]='\0';
     }
-    else if (strcmp(argv[i],"-io_ibuffer") == 0)
+    else if (UnicodeUtils::strcmp(argv[i],"-io_ibuffer") == 0)
     {
       if ((i+1) >= argc)
       {
@@ -1713,24 +1717,24 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
       set_io_ibuffer_size((I32)atoi(argv[i+1]));
       *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
     }
-    else if (strcmp(argv[i],"-do_not_populate") == 0)
+    else if (UnicodeUtils::strcmp(argv[i],"-do_not_populate") == 0)
     {
       set_populate_header(FALSE);
       *argv[i]='\0';
     }
-    else if (strcmp(argv[i],"-ipts") == 0)
+    else if (UnicodeUtils::strcmp(argv[i],"-ipts") == 0)
     {
       itxt = TRUE;
       ipts = TRUE;
       *argv[i]='\0';
     }
-    else if (strcmp(argv[i],"-iptx") == 0)
+    else if (UnicodeUtils::strcmp(argv[i],"-iptx") == 0)
     {
       itxt = TRUE;
       iptx = TRUE;
       *argv[i]='\0';
     }
-    else if (strcmp(argv[i],"-itxt") == 0)
+    else if (UnicodeUtils::strcmp(argv[i],"-itxt") == 0)
     {
       itxt = TRUE;
       *argv[i]='\0';
@@ -1841,35 +1845,35 @@ const CHAR* LASreadOpener::get_file_name(U32 number) const
 
 I32 LASreadOpener::get_file_format(U32 number) const
 {
-  if (strstr(file_names[number], ".las") || strstr(file_names[number], ".LAS"))
+  if (UnicodeUtils::strstr(file_names[number], ".las") || UnicodeUtils::strstr(file_names[number], ".LAS"))
   {
     return LAS_TOOLS_FORMAT_LAS;
   }
-  else if (strstr(file_names[number], ".laz") || strstr(file_names[number], ".LAZ"))
+  else if (UnicodeUtils::strstr(file_names[number], ".laz") || UnicodeUtils::strstr(file_names[number], ".LAZ"))
   {
     return LAS_TOOLS_FORMAT_LAZ;
   }
-  else if (strstr(file_names[number], ".bin") || strstr(file_names[number], ".BIN"))
+  else if (UnicodeUtils::strstr(file_names[number], ".bin") || UnicodeUtils::strstr(file_names[number], ".BIN"))
   {
     return LAS_TOOLS_FORMAT_BIN;
   }
-  else if (strstr(file_names[number], ".shp") || strstr(file_names[number], ".SHP"))
+  else if (UnicodeUtils::strstr(file_names[number], ".shp") || UnicodeUtils::strstr(file_names[number], ".SHP"))
   {
     return LAS_TOOLS_FORMAT_SHP;
   }
-  else if (strstr(file_names[number], ".qi") || strstr(file_names[number], ".QI"))
+  else if (UnicodeUtils::strstr(file_names[number], ".qi") || UnicodeUtils::strstr(file_names[number], ".QI"))
   {
     return LAS_TOOLS_FORMAT_QFIT;
   }
-  else if (strstr(file_names[number], ".asc") || strstr(file_names[number], ".ASC"))
+  else if (UnicodeUtils::strstr(file_names[number], ".asc") || UnicodeUtils::strstr(file_names[number], ".ASC"))
   {
     return LAS_TOOLS_FORMAT_ASC;
   }
-  else if (strstr(file_names[number], ".bil") || strstr(file_names[number], ".BIL"))
+  else if (UnicodeUtils::strstr(file_names[number], ".bil") || UnicodeUtils::strstr(file_names[number], ".BIL"))
   {
     return LAS_TOOLS_FORMAT_BIL;
   }
-  else if (strstr(file_names[number], ".dtm") || strstr(file_names[number], ".DTM"))
+  else if (UnicodeUtils::strstr(file_names[number], ".dtm") || UnicodeUtils::strstr(file_names[number], ".DTM"))
   {
     return LAS_TOOLS_FORMAT_DTM;
   }
@@ -1935,8 +1939,8 @@ BOOL LASreadOpener::add_file_name(const CHAR* file_name, BOOL unique)
 {
   BOOL r = FALSE;
   HANDLE h;
-  WIN32_FIND_DATA info;
-  h = FindFirstFile(file_name, &info);
+  WIN32_FIND_DATAW info;
+  h = FindFirstFileW(UnicodeUtils::towstring(file_name).c_str(), &info);
   if (h != INVALID_HANDLE_VALUE)
   {
     // find the path
@@ -1949,16 +1953,16 @@ BOOL LASreadOpener::add_file_name(const CHAR* file_name, BOOL unique)
       strncpy(full_file_name, file_name, len);
 	    do
 	    {
-        sprintf(&full_file_name[len], "%s", info.cFileName);
+        sprintf(&full_file_name[len], "%s", UnicodeUtils::utf8_encode(info.cFileName).c_str());
         if (add_file_name_single(full_file_name, unique)) r = TRUE;
-  	  } while (FindNextFile(h, &info));
+  	  } while (FindNextFileW(h, &info));
     }
     else
     {
       do
       {
-        if (add_file_name_single(info.cFileName, unique)) r = TRUE;
-  	  } while (FindNextFile(h, &info));
+        if (add_file_name_single(UnicodeUtils::utf8_encode(info.cFileName).c_str(), unique)) r = TRUE;
+  	  } while (FindNextFileW(h, &info));
     }
 	  FindClose(h);
   }
@@ -1977,7 +1981,7 @@ BOOL LASreadOpener::add_file_name(const CHAR* file_name, BOOL unique)
     U32 i;
     for (i = 0; i < file_name_number; i++)
     {
-      if (strcmp(file_names[i], file_name) == 0)
+      if (UnicodeUtils::strcmp(file_names[i], file_name) == 0)
       {
         return FALSE;
       }
@@ -2007,7 +2011,8 @@ BOOL LASreadOpener::add_file_name(const CHAR* file_name, BOOL unique)
 
 BOOL LASreadOpener::add_list_of_files(const CHAR* list_of_files, BOOL unique)
 {
-  FILE* file = fopen(list_of_files, "r");
+  FILE* file = UnicodeUtils::open(list_of_files, "r");
+
   if (file == 0)
   {
     fprintf(stderr, "ERROR: cannot open '%s'\n", list_of_files);
@@ -2061,8 +2066,8 @@ BOOL LASreadOpener::add_neighbor_file_name(const CHAR* neighbor_file_name, BOOL 
 {
   BOOL r = FALSE;
   HANDLE h;
-  WIN32_FIND_DATA info;
-  h = FindFirstFile(neighbor_file_name, &info);
+  WIN32_FIND_DATAW info;
+  h = FindFirstFileW(UnicodeUtils::towstring(neighbor_file_name).c_str(), &info);
   if (h != INVALID_HANDLE_VALUE)
   {
     // find the path
@@ -2075,16 +2080,16 @@ BOOL LASreadOpener::add_neighbor_file_name(const CHAR* neighbor_file_name, BOOL 
       strncpy(full_neighbor_file_name, neighbor_file_name, len);
 	    do
 	    {
-        sprintf(&full_neighbor_file_name[len], "%s", info.cFileName);
+        sprintf(&full_neighbor_file_name[len], "%s", UnicodeUtils::utf8_encode(info.cFileName).c_str());
         if (add_neighbor_file_name_single(full_neighbor_file_name, unique)) r = TRUE;
-  	  } while (FindNextFile(h, &info));
+  	  } while (FindNextFileW(h, &info));
     }
     else
     {
       do
       {
-        if (add_neighbor_file_name_single(info.cFileName, unique)) r = TRUE;
-  	  } while (FindNextFile(h, &info));
+        if (add_neighbor_file_name_single(UnicodeUtils::utf8_encode(info.cFileName).c_str(), unique)) r = TRUE;
+  	  } while (FindNextFileW(h, &info));
     }
 	  FindClose(h);
   }
@@ -2103,7 +2108,7 @@ BOOL LASreadOpener::add_neighbor_file_name(const CHAR* neighbor_file_name, BOOL 
     U32 i;
     for (i = 0; i < neighbor_file_name_number; i++)
     {
-      if (strcmp(neighbor_file_names[i], neighbor_file_name) == 0)
+      if (UnicodeUtils::strcmp(neighbor_file_names[i], neighbor_file_name) == 0)
       {
         return FALSE;
       }

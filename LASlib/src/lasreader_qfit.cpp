@@ -29,16 +29,13 @@
 ===============================================================================
 */
 #include "lasreader_qfit.hpp"
+#include "UnicodeUtils.hpp"
 
 #include "bytestreamin.hpp"
 #include "bytestreamin_file.hpp"
 
 #include <stdlib.h>
 #include <string.h>
-
-#ifdef _WIN32
-#include <windows.h>
-#endif
 
 BOOL LASreaderQFIT::open(const char* file_name)
 {
@@ -49,8 +46,8 @@ BOOL LASreaderQFIT::open(const char* file_name)
   }
 
   // open file
+  file = UnicodeUtils::open(file_name, "rb");
 
-  file = fopen(file_name, "rb");
   if (file == 0)
   {
     fprintf(stderr, "ERROR: cannot open file '%s'\n", file_name);
@@ -407,8 +404,8 @@ BOOL LASreaderQFIT::reopen(const char* file_name)
   }
 
   // open file
+  file = UnicodeUtils::open(file_name, "rb");
 
-  file = fopen(file_name, "rb");
   if (file == 0)
   {
     fprintf(stderr, "ERROR: cannot open file '%s'\n", file_name);

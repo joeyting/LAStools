@@ -29,13 +29,10 @@
 ===============================================================================
 */
 #include "lasreader_asc.hpp"
+#include "UnicodeUtils.hpp"
 
 #include <stdlib.h>
 #include <string.h>
-
-#ifdef _WIN32
-#include <windows.h>
-#endif
 
 extern "C" FILE* fopen_compressed(const char* filename, const char* mode, bool* piped);
 
@@ -130,38 +127,38 @@ BOOL LASreaderASC::open(const CHAR* file_name, BOOL comma_not_point)
       }
     }
 
-    if (strstr(line, "ncols") || strstr(line, "NCOLS"))
+    if (UnicodeUtils::strstr(file_name, "ncols") || UnicodeUtils::strstr(file_name, "NCOLS"))
     {
       sscanf(line, "%s %d", dummy, &ncols);
       free(line);
       line_size = 1024+50*ncols;
       line = (CHAR*)malloc(sizeof(CHAR)*line_size);
     }
-    else if (strstr(line, "nrows") || strstr(line, "NROWS"))
+    else if (UnicodeUtils::strstr(line, "nrows") || UnicodeUtils::strstr(line, "NROWS"))
     {
       sscanf(line, "%s %d", dummy, &nrows);
     }
-    else if (strstr(line, "xllcorner") || strstr(line, "XLLCORNER"))
+    else if (UnicodeUtils::strstr(line, "xllcorner") || UnicodeUtils::strstr(line, "XLLCORNER"))
     {
       sscanf(line, "%s %lf", dummy, &xllcorner);
     }
-    else if (strstr(line, "yllcorner") || strstr(line, "YLLCORNER"))
+    else if (UnicodeUtils::strstr(line, "yllcorner") || UnicodeUtils::strstr(line, "YLLCORNER"))
     {
       sscanf(line, "%s %lf", dummy, &yllcorner);
     }
-    else if (strstr(line, "xllcenter") || strstr(line, "XLLCENTER"))
+    else if (UnicodeUtils::strstr(line, "xllcenter") || UnicodeUtils::strstr(line, "XLLCENTER"))
     {
       sscanf(line, "%s %lf", dummy, &xllcenter);
     }
-    else if (strstr(line, "yllcenter") || strstr(line, "YLLCENTER"))
+    else if (UnicodeUtils::strstr(line, "yllcenter") || UnicodeUtils::strstr(line, "YLLCENTER"))
     {
       sscanf(line, "%s %lf", dummy, &yllcenter);
     }
-    else if (strstr(line, "cellsize") || strstr(line, "CELLSIZE"))
+    else if (UnicodeUtils::strstr(line, "cellsize") || UnicodeUtils::strstr(line, "CELLSIZE"))
     {
       sscanf(line, "%s %f", dummy, &cellsize);
     }
-    else if (strstr(line, "nodata_value") || strstr(line, "NODATA_VALUE") || strstr(line, "nodata_VALUE") || strstr(line, "NODATA_value"))
+    else if (UnicodeUtils::strstr(line, "nodata_value") || UnicodeUtils::strstr(line, "NODATA_VALUE") || UnicodeUtils::strstr(line, "nodata_VALUE") || UnicodeUtils::strstr(line, "NODATA_value"))
     {
       sscanf(line, "%s %f", dummy, &nodata);
     }

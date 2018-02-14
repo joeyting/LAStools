@@ -29,6 +29,7 @@
 ===============================================================================
 */
 #include "laswaveform13reader.hpp"
+#include "UnicodeUtils.hpp"
 
 #include "bytestreamin_file.hpp"
 #include "arithmeticdecoder.hpp"
@@ -108,13 +109,13 @@ BOOL LASwaveform13reader::open(const char* file_name, I64 start_of_waveform_data
 
   if (start_of_waveform_data_packet_record == 0)
   {
-    if (!compressed && (strstr(".wdp", file_name) || strstr(".WDP", file_name))) 
+    if (!compressed && (UnicodeUtils::strstr(".wdp", file_name) || UnicodeUtils::strstr(".WDP", file_name))) 
     {
-      file = fopen(file_name, "rb");
+	  FILE*   file = UnicodeUtils::open(file_name, "rb");;
     }
-    else if (compressed && (strstr(".wdz", file_name) || strstr(".WDZ", file_name))) 
+    else if (compressed && (UnicodeUtils::strstr(".wdz", file_name) || UnicodeUtils::strstr(".WDZ", file_name))) 
     {
-      file = fopen(file_name, "rb");
+ 	  FILE*   file = UnicodeUtils::open(file_name, "rb");
     }
     else
     {
@@ -132,13 +133,15 @@ BOOL LASwaveform13reader::open(const char* file_name, I64 start_of_waveform_data
         file_name_temp[len-2] = 'd';
         file_name_temp[len-1] = (compressed ? 'z' : 'p');
       }
-      file = fopen(file_name_temp, "rb");
+
+	  file = UnicodeUtils::open(file_name_temp, "rb");
+
       free(file_name_temp);
     }
   }
   else
   {
-    file = fopen(file_name, "rb");
+	  FILE*   file = UnicodeUtils::open(file_name, "rb");
   }
 
   if (file == 0)

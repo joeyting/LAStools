@@ -35,6 +35,7 @@
 #include "laswriter_qfit.hpp"
 #include "laswriter_wrl.hpp"
 #include "laswriter_txt.hpp"
+#include "UnicodeUtils.hpp"
 
 #include <stdlib.h>
 #include <string.h>
@@ -425,7 +426,7 @@ BOOL LASwriteOpener::set_directory(const CHAR* directory)
   if (this->directory) free(this->directory);
   if (directory)
   {
-    if (strstr(directory, ";") || strstr(directory, "\""))
+    if (UnicodeUtils::strstr(directory, ";") || UnicodeUtils::strstr(directory, "\""))
     {
       fprintf(stderr,"WARNING: specified '-odir' seems to contain a substring '\\\"' such\n");
       fprintf(stderr,"         as -odir \"D:\\\" or -odir \"..\\tiles\\\". this command will\n");
@@ -469,23 +470,23 @@ void LASwriteOpener::set_file_name(const CHAR* file_name)
     {
       int len = strlen(file_name);
       const CHAR* format = file_name + len - 4;
-      if (strstr(format, ".laz") || strstr(format, ".LAZ"))
+      if (UnicodeUtils::strstr(format, ".laz") || UnicodeUtils::strstr(format, ".LAZ"))
       {
         this->format = LAS_TOOLS_FORMAT_LAZ;
       }
-      else if (strstr(format, ".las") || strstr(format, ".LAS"))
+      else if (UnicodeUtils::strstr(format, ".las") || UnicodeUtils::strstr(format, ".LAS"))
       {
         this->format = LAS_TOOLS_FORMAT_LAS;
       }
-      else if (strstr(format, ".bin") || strstr(format, ".BIN")) // terrasolid
+      else if (UnicodeUtils::strstr(format, ".bin") || UnicodeUtils::strstr(format, ".BIN")) // terrasolid
       {
         this->format = LAS_TOOLS_FORMAT_BIN;
       }
-      else if (strstr(format, ".qi") || strstr(format, ".QI")) // QFIT
+      else if (UnicodeUtils::strstr(format, ".qi") || UnicodeUtils::strstr(format, ".QI")) // QFIT
       {
         this->format = LAS_TOOLS_FORMAT_QFIT;
       }
-      else if (strstr(format, ".wrl") || strstr(format, ".WRL")) // VRML
+      else if (UnicodeUtils::strstr(format, ".wrl") || UnicodeUtils::strstr(format, ".WRL")) // VRML
       {
         this->format = LAS_TOOLS_FORMAT_VRML;
       }
@@ -600,23 +601,23 @@ BOOL LASwriteOpener::set_format(const CHAR* format)
 {
   if (format)
   {
-    if (strstr(format, "laz") || strstr(format, "LAZ"))
+    if (UnicodeUtils::strstr(format, "laz") || UnicodeUtils::strstr(format, "LAZ"))
     {
       return set_format(LAS_TOOLS_FORMAT_LAZ);
     }
-    else if (strstr(format, "las") || strstr(format, "LAS"))
+    else if (UnicodeUtils::strstr(format, "las") || UnicodeUtils::strstr(format, "LAS"))
     {
       return set_format(LAS_TOOLS_FORMAT_LAS);
     }
-    else if (strstr(format, "bin") || strstr(format, "BIN")) // terrasolid
+    else if (UnicodeUtils::strstr(format, "bin") || UnicodeUtils::strstr(format, "BIN")) // terrasolid
     {
       return set_format(LAS_TOOLS_FORMAT_BIN);
     }
-    else if (strstr(format, "qi") || strstr(format, "QI")) // QFIT
+    else if (UnicodeUtils::strstr(format, "qi") || UnicodeUtils::strstr(format, "QI")) // QFIT
     {
       return set_format(LAS_TOOLS_FORMAT_QFIT);
     }
-    else if (strstr(format, "wrl") || strstr(format, "WRL")) // VRML
+    else if (UnicodeUtils::strstr(format, "wrl") || UnicodeUtils::strstr(format, "WRL")) // VRML
     {
       return set_format(LAS_TOOLS_FORMAT_VRML);
     }
@@ -791,7 +792,7 @@ void LASwriteOpener::make_file_name(const CHAR* file_name, I32 file_number)
 
   if (directory) add_directory();
 
-  if (file_name && (strcmp(this->file_name, file_name) == 0))
+  if (file_name && (UnicodeUtils::strcmp(this->file_name, file_name) == 0))
   {
     if (!force)
     {
@@ -918,23 +919,23 @@ I32 LASwriteOpener::get_format() const
   }
   else
   {
-    if (strstr(file_name, ".laz") || strstr(file_name, ".LAZ"))
+    if (UnicodeUtils::strstr(file_name, ".laz") || UnicodeUtils::strstr(file_name, ".LAZ"))
     {
       return LAS_TOOLS_FORMAT_LAZ;
     }
-    else if (strstr(file_name, ".las") || strstr(file_name, ".LAS"))
+    else if (UnicodeUtils::strstr(file_name, ".las") || UnicodeUtils::strstr(file_name, ".LAS"))
     {
       return LAS_TOOLS_FORMAT_LAS;
     }
-    else if (strstr(file_name, ".bin") || strstr(file_name, ".BIN")) // terrasolid
+    else if (UnicodeUtils::strstr(file_name, ".bin") || UnicodeUtils::strstr(file_name, ".BIN")) // terrasolid
     {
       return LAS_TOOLS_FORMAT_BIN;
     }
-    else if (strstr(file_name, ".qi") || strstr(file_name, ".QI")) // QFIT
+    else if (UnicodeUtils::strstr(file_name, ".qi") || UnicodeUtils::strstr(file_name, ".QI")) // QFIT
     {
       return LAS_TOOLS_FORMAT_QFIT;
     }
-    else if (strstr(file_name, ".wrl") || strstr(file_name, ".WRL")) // VRML
+    else if (UnicodeUtils::strstr(file_name, ".wrl") || UnicodeUtils::strstr(file_name, ".WRL")) // VRML
     {
       return LAS_TOOLS_FORMAT_VRML;
     }

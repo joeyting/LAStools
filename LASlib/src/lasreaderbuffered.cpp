@@ -29,6 +29,7 @@
 ===============================================================================
 */
 #include "lasreaderbuffered.hpp"
+#include "UnicodeUtils.hpp"
 
 #include "lasindex.hpp"
 #include "lasfilter.hpp"
@@ -99,8 +100,10 @@ BOOL LASreaderBuffered::set_file_name(const char* file_name)
     fprintf(stderr, "ERROR: file name pointer is NULL\n");
     return FALSE;
   }
+
   // does the file exist
-  FILE* file = fopen(file_name, "r");
+  FILE* file = UnicodeUtils::open(file_name, "r");
+
   if (file == 0)
   {
     fprintf(stderr, "ERROR: file '%s' cannot be opened\n", file_name);
@@ -120,8 +123,10 @@ BOOL LASreaderBuffered::add_neighbor_file_name(const char* file_name)
     fprintf(stderr, "ERROR: file name pointer is NULL\n");
     return FALSE;
   }
+
   // does the file exist
-  FILE* file = fopen(file_name, "r");
+  FILE*  file = UnicodeUtils::open(file_name, "r");
+
   if (file == 0)
   {
     fprintf(stderr, "ERROR: file '%s' cannot be opened\n", file_name);

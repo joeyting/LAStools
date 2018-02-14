@@ -29,6 +29,7 @@
 ===============================================================================
 */
 #include "laswaveform13writer.hpp"
+#include "UnicodeUtils.hpp"
 
 #include "bytestreamout_file.hpp"
 #include "arithmeticencoder.hpp"
@@ -135,7 +136,8 @@ BOOL LASwaveform13writer::open(const char* file_name, const LASvlr_wave_packet_d
     file_name_temp[len-2] = 'd';
     file_name_temp[len-1] = (compressed ? 'z' : 'p');
   }
-  file = fopen(file_name_temp, "wb");
+
+  file = UnicodeUtils::open(file_name_temp, "wb");
 
   if (file == 0)
   {

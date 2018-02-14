@@ -29,6 +29,7 @@
 ===============================================================================
 */
 #include "laswriter_qfit.hpp"
+#include "UnicodeUtils.hpp"
 
 #include "bytestreamout_file.hpp"
 
@@ -55,7 +56,7 @@ BOOL LASwriterQFIT::open(const char* file_name, const LASheader* header, I32 ver
     return FALSE;
   }
 
-  file = fopen(file_name, "wb");
+  file = UnicodeUtils::open(file_name, "wb");
 
   if (file == 0)
   {

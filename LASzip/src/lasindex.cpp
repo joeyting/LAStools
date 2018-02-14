@@ -28,6 +28,8 @@
 
 ===============================================================================
 */
+#include "UnicodeUtils.hpp"
+
 #include "lasindex.hpp"
 
 #include <stdio.h>
@@ -328,11 +330,11 @@ BOOL LASindex::read(const char* file_name)
 {
   if (file_name == 0) return FALSE;
   char* name = strdup(file_name);
-  if (strstr(file_name, ".las") || strstr(file_name, ".laz"))
+  if (UnicodeUtils::strstr(file_name, ".las") || UnicodeUtils::strstr(file_name, ".laz"))
   {
     name[strlen(name)-1] = 'x';
   }
-  else if (strstr(file_name, ".LAS") || strstr(file_name, ".LAZ"))
+  else if (UnicodeUtils::strstr(file_name, ".LAS") || UnicodeUtils::strstr(file_name, ".LAZ"))
   {
     name[strlen(name)-1] = 'X';
   }
@@ -342,7 +344,9 @@ BOOL LASindex::read(const char* file_name)
     name[strlen(name)-2] = 'a';
     name[strlen(name)-1] = 'x';
   }
-  FILE* file = fopen(name, "rb");
+
+  FILE* file = UnicodeUtils::open(name, "rb");
+
   if (file == 0)
   {
     free(name);
@@ -379,7 +383,8 @@ BOOL LASindex::append(const char* file_name) const
 
   lasreader->close();
 
-  FILE* file = fopen(file_name, "rb");
+  FILE* file = UnicodeUtils::open(file_name, "rb");
+
   ByteStreamIn* bytestreamin = 0;
   if (IS_LITTLE_ENDIAN())
     bytestreamin = new ByteStreamInFileLE(file);
@@ -443,7 +448,9 @@ BOOL LASindex::append(const char* file_name) const
   fclose(file);
 
   ByteStreamOut* bytestreamout;
-  file = fopen(file_name, "rb+");
+
+  file = UnicodeUtils::open(file_name, "rb+");
+
   if (IS_LITTLE_ENDIAN())
     bytestreamout = new ByteStreamOutFileLE(file);
   else
@@ -503,11 +510,11 @@ BOOL LASindex::write(const char* file_name) const
 {
   if (file_name == 0) return FALSE;
   char* name = strdup(file_name);
-  if (strstr(file_name, ".las") || strstr(file_name, ".laz"))
+  if (UnicodeUtils::strstr(file_name, ".las") || UnicodeUtils::strstr(file_name, ".laz"))
   {
     name[strlen(name)-1] = 'x';
   }
-  else if (strstr(file_name, ".LAS") || strstr(file_name, ".LAZ"))
+  else if (UnicodeUtils::strstr(file_name, ".LAS") || UnicodeUtils::strstr(file_name, ".LAZ"))
   {
     name[strlen(name)-1] = 'X';
   }
@@ -517,7 +524,9 @@ BOOL LASindex::write(const char* file_name) const
     name[strlen(name)-2] = 'a';
     name[strlen(name)-1] = 'x';
   }
-  FILE* file = fopen(name, "wb");
+
+  FILE* file = UnicodeUtils::open(file_name, "wb");
+
   if (file == 0)
   {
     fprintf(stderr,"ERROR (LASindex): cannot open '%s' for write\n", name);

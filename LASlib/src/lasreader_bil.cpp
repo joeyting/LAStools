@@ -29,13 +29,10 @@
 ===============================================================================
 */
 #include "lasreader_bil.hpp"
+#include "UnicodeUtils.hpp"
 
 #include <stdlib.h>
 #include <string.h>
-
-#ifdef _WIN32
-#include <windows.h>
-#endif
 
 BOOL LASreaderBIL::open(const CHAR* file_name)
 {
@@ -91,8 +88,8 @@ BOOL LASreaderBIL::open(const CHAR* file_name)
   }
 
   // open the BIL file
+  file = UnicodeUtils::open(file_name, "rb");
 
-  file = fopen(file_name, "rb");
   if (file == 0)
   {
     fprintf(stderr, "ERROR: cannot open file '%s'\n", file_name);
@@ -362,7 +359,7 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
   file_name_hdr[len+2] = 'd';
   file_name_hdr[len+3] = 'r';
 
-  FILE* file = fopen(file_name_hdr, "r");
+  FILE* file = UnicodeUtils::open(file_name, "r");
 
   if (file == 0)
   {
@@ -370,7 +367,8 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
     file_name_hdr[len+2] = 'D';
     file_name_hdr[len+3] = 'R';
 
-    file = fopen(file_name_hdr, "r");
+	file = UnicodeUtils::open(file_name_hdr, "r");
+
     free(file_name_hdr);
 
     if (file == 0)
@@ -406,23 +404,23 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
     {
       continue;
     }
-    else if (strstr(line, "ncols") || strstr(line, "NCOLS"))
+    else if (UnicodeUtils::strstr(line, "ncols") || UnicodeUtils::strstr(line, "NCOLS"))
     {
       sscanf(line, "%s %d", dummy, &ncols);
     }
-    else if (strstr(line, "nrows") || strstr(line, "NROWS"))
+    else if (UnicodeUtils::strstr(line, "nrows") || UnicodeUtils::strstr(line, "NROWS"))
     {
       sscanf(line, "%s %d", dummy, &nrows);
     }
-    else if (strstr(line, "nbands") || strstr(line, "NBANDS"))
+    else if (UnicodeUtils::strstr(line, "nbands") || UnicodeUtils::strstr(line, "NBANDS"))
     {
       sscanf(line, "%s %d", dummy, &nbands);
     }
-    else if (strstr(line, "nbits") || strstr(line, "NBITS"))
+    else if (UnicodeUtils::strstr(line, "nbits") || UnicodeUtils::strstr(line, "NBITS"))
     {
       sscanf(line, "%s %d", dummy, &nbits);
     }
-    else if (strstr(line, "layout") || strstr(line, "LAYOUT"))
+    else if (UnicodeUtils::strstr(line, "layout") || UnicodeUtils::strstr(line, "LAYOUT"))
     {
       CHAR layout[32];
       if (sscanf(line, "%s %s", dummy, layout) == 2)
@@ -437,7 +435,7 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
         fprintf(stderr, "WARNING: argument of %s missing for LASreader_bil\n", dummy);
       }
     }
-    else if (strstr(line, "pixeltype") || strstr(line, "PIXELTYPE"))
+    else if (UnicodeUtils::strstr(line, "pixeltype") || UnicodeUtils::strstr(line, "PIXELTYPE"))
     {
       CHAR pixeltype[32];
       sscanf(line, "%s %s", dummy, pixeltype);
@@ -454,11 +452,11 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
         fprintf(stderr, "WARNING: pixeltype '%s' not recognized by LASreader_bil\n", pixeltype);
       }
     }
-    else if (strstr(line, "nodata") || strstr(line, "NODATA"))
+    else if (UnicodeUtils::strstr(line, "nodata") || UnicodeUtils::strstr(line, "NODATA"))
     {
       sscanf(line, "%s %f", dummy, &nodata);
     }
-    else if (strstr(line, "byteorder") || strstr(line, "BYTEORDER")) // if little or big endian machine (i == intel, m == motorola)
+    else if (UnicodeUtils::strstr(line, "byteorder") || UnicodeUtils::strstr(line, "BYTEORDER")) // if little or big endian machine (i == intel, m == motorola)
     {
       CHAR byteorder[32];
       sscanf(line, "%s %s", dummy, byteorder);
@@ -467,19 +465,19 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
         fprintf(stderr, "WARNING: byteorder '%s' not recognized by LASreader_bil\n", byteorder);
       }
     }
-    else if (strstr(line, "ulxmap") || strstr(line, "ULXMAP"))
+    else if (UnicodeUtils::strstr(line, "ulxmap") || UnicodeUtils::strstr(line, "ULXMAP"))
     {
       sscanf(line, "%s %lf", dummy, &ulxmap);
     }
-    else if (strstr(line, "ulymap") || strstr(line, "ULYMAP"))
+    else if (UnicodeUtils::strstr(line, "ulymap") || UnicodeUtils::strstr(line, "ULYMAP"))
     {
       sscanf(line, "%s %lf", dummy, &ulymap);
     }
-    else if (strstr(line, "xdim") || strstr(line, "XDIM"))
+    else if (UnicodeUtils::strstr(line, "xdim") || UnicodeUtils::strstr(line, "XDIM"))
     {
       sscanf(line, "%s %f", dummy, &xdim);
     }
-    else if (strstr(line, "ydim") || strstr(line, "YDIM"))
+    else if (UnicodeUtils::strstr(line, "ydim") || UnicodeUtils::strstr(line, "YDIM"))
     {
       sscanf(line, "%s %f", dummy, &ydim);
     }
@@ -535,15 +533,14 @@ BOOL LASreaderBIL::read_blw_file(const CHAR* file_name)
   file_name_bwl[len+2] = 'l';
   file_name_bwl[len+3] = 'w';
 
-  FILE* file = fopen(file_name_bwl, "r");
+  FILE* file = UnicodeUtils::open(file_name_bwl, "r");
 
   if (file == 0)
   {
     file_name_bwl[len+1] = 'B';
     file_name_bwl[len+2] = 'L';
     file_name_bwl[len+3] = 'W';
-
-    file = fopen(file_name_bwl, "r");
+	file = UnicodeUtils::open(file_name_bwl, "r");
 
     if (file == 0)
     {
@@ -785,7 +782,8 @@ BOOL LASreaderBIL::reopen(const CHAR* file_name)
     return FALSE;
   }
 
-  file = fopen(file_name, "rb");
+  file = UnicodeUtils::open(file_name, "rb");
+
   if (file == 0)
   {
     fprintf(stderr, "ERROR: cannot reopen file '%s'\n", file_name);

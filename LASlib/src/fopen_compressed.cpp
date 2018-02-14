@@ -27,6 +27,7 @@
   
 ===============================================================================
 */
+#include "UnicodeUtils.hpp"
 
 #include <stdio.h>
 #include <string.h>
@@ -35,7 +36,6 @@
 #include <io.h>
 #include <fcntl.h>
 #include <process.h>
-#include <windows.h>
 #endif
 
 enum PIPES { READ_HANDLE, WRITE_HANDLE }; /* Constants 0 and 1 for READ and WRITE */
@@ -153,7 +153,8 @@ static FILE* fopenGzipped(const char* filename, const char* mode)
 	if (mode[0] == 'r')
 	{
 		// open input file
-		FILE* gzipInput = fopen(filename, mode);
+		FILE* gzipInput = UnicodeUtils::open(filename, mode);
+
 		if (!gzipInput) return NULL;
 
 		// create the pipe
@@ -332,7 +333,7 @@ FILE* fopen_compressed(const char* filename, const char* mode, bool* piped)
 {
   FILE* file;
 
-  if (strstr(filename, ".gz"))
+  if (UnicodeUtils::strstr(filename, ".gz"))
   {
 #ifdef _WIN32
     file = fopenGzipped(filename, mode);
@@ -342,7 +343,7 @@ FILE* fopen_compressed(const char* filename, const char* mode, bool* piped)
     return 0;
 #endif
   }
-  else if (strstr(filename, ".zip"))
+  else if (UnicodeUtils::strstr(filename, ".zip"))
   {
 #ifdef _WIN32
     file = fopenZIPped(filename, mode);
@@ -352,7 +353,7 @@ FILE* fopen_compressed(const char* filename, const char* mode, bool* piped)
     return 0;
 #endif
   }
-  else if (strstr(filename, ".7z"))
+  else if (UnicodeUtils::strstr(filename, ".7z"))
   {
 #ifdef _WIN32
     file = fopen7zipped(filename, mode);
@@ -362,7 +363,7 @@ FILE* fopen_compressed(const char* filename, const char* mode, bool* piped)
     return 0;
 #endif
   }
-  else if (strstr(filename, ".rar"))
+  else if (UnicodeUtils::strstr(filename, ".rar"))
   {
 #ifdef _WIN32
     file = fopenRARed(filename, mode);
