@@ -12,6 +12,9 @@
 #include <windows.h>
 #endif
 
+#include <cstring>
+#include <cstdio>
+
 #ifdef _MSC_VER
 #  pragma warning(push)
 #  pragma warning(disable:4267)
@@ -31,7 +34,7 @@ public:
 		return strTo;
 	}
 
-	static std::wstring towstring(const CHAR* s)
+	static std::wstring towstring(const char* s)
 	{
 		std::string str(s);
 		if (str.size() > 250)
@@ -55,7 +58,7 @@ public:
 	}
 #endif
 
-	static int strcmp(const CHAR* str, const CHAR* ext)
+	static int strcmp(const char* str, const char* ext)
 	{
 #ifdef _WIN32
 		return wcscmp(towstring(str).c_str(), towstring(ext).c_str());
@@ -65,17 +68,19 @@ public:
 
 	}
 
-	static bool strstr(const CHAR* str, const CHAR* ext)
+	static bool strstr(const char* str, const char* ext)
 	{
 #ifdef _WIN32
 		return wcsstr(towstring(str).c_str(), towstring(ext).c_str()) != nullptr;
 #else
-		return strstr(str, ext) != nullptr;
+		if (strstr(str, ext))
+			return true;
+		return false;
 #endif
 	
 	}
 
-	static FILE* open(const CHAR* filename, const CHAR* mode)
+	static FILE* open(const char* filename, const char* mode)
 	{
 		// open input file
 #ifdef _WIN32
