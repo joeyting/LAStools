@@ -63,7 +63,7 @@ public:
 #ifdef _WIN32
 		return wcscmp(towstring(str).c_str(), towstring(ext).c_str());
 #else
-		return strstr(str, ext);
+		return ::strcmp(str, ext);
 #endif
 
 	}
@@ -73,9 +73,7 @@ public:
 #ifdef _WIN32
 		return wcsstr(towstring(str).c_str(), towstring(ext).c_str()) != nullptr;
 #else
-		if (strstr(str, ext))
-			return true;
-		return false;
+		return !(::strstr(str, ext) == nullptr);
 #endif
 	
 	}
